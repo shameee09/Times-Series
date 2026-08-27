@@ -2,8 +2,26 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from sklearn.metrics import mean_squared_error, mean_absolute_percentage_error
 
+def split_sequences(sequences, n_steps_in, n_steps_out):
 
-def conversion(y_train, stk_data):
+    X, y = list(), list()
+
+    for i in range(len(sequences)):
+        end_ix = i + n_steps_in
+        out_end_ix = end_ix + n_steps_out
+        if out_end_ix > len(sequences):
+            break
+        seq_x, seq_y = sequences[i:end_ix, :], sequences[end_ix:out_end_ix, :]
+
+        X.append(seq_x)
+        y.append(seq_y)
+
+    from numpy import array
+
+    return array(X), array(y)
+    
+    
+def conversion(y_train, data):
     """
     Convert y_train into a DataFrame using the columns of stk_data.
     """
@@ -18,15 +36,15 @@ def conversion(y_train, stk_data):
     return actual_y_train
 
 
-def conversionSingle(y_train, stk_data):
+def conversionSingle(y_train, data):
     """
     Convert a single-column y_train into a DataFrame.
     stk_data can be a column name or a list of column names.
     """
-    if isinstance(stk_data, str):
-        columns = [stk_data]
+    if isinstance(data, str):
+        columns = [data]
     else:
-        columns = stk_data
+        columns = data
 
     actual_y_train = pd.DataFrame(
         index=range(len(y_train)),
